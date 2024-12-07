@@ -1,0 +1,4 @@
+venv
+investmentportfolioapp\__pycache__\
+investmentportfolioapp\migrations\
+notes.txt

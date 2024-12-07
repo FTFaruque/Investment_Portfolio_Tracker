@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Dashboard</h1>
+        <a href="/add-investment" class="btn btn-primary">Add Investment</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-4">
+        <h4>Filter Investments</h4>
+        <form method="GET" action="/dashboard">
+            <select class="form-select" name="filter" aria-label="Select category" onchange="this.form.submit()">
+                <option value="All" {% if not selected_category %}selected{% endif %}>All Categories</option>
+                <option value="Stocks" {% if selected_category == 'Stocks' %}selected{% endif %}>Stocks</option>
+                <option value="Cash" {% if selected_category == 'Cash' %}selected{% endif %}>Cash</option>
+                <option value="Gold" {% if selected_category == 'Gold' %}selected{% endif %}>Gold</option>
+                <option value="Real Estate" {% if selected_category == 'Real Estate' %}selected{% endif %}>Real Estate</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Graph Section -->
+    <div class="mb-4">
+        <h4>Investment Overview</h4>
+        <div id="selectedCategory" style="display: none;">{{ selected_category | tojson }}</div>
+        
+        <div id="labelData" style="display: none;">{{ labelData | tojson }} </div>
+        <div id="amountData" style="display: none;"> {{ amountData | tojson }} </div>
+        <div id="currencyLabel" style="display: none;"> {{ currencyLabel | tojson }} </div>
+        <div id="currencyFrequency" style="display: none;"> {{ currencyFrequency | tojson }} </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <label for="graphType" class="form-label me-2">View count by:</label>
+            <select class="form-select w-auto" id="graphType">
+                <option value="category" {% if selected_category == "All" %} enabled selected {% else %} disabled {% endif %}>Category</option>
+                <option value="currency" {% if selected_category != "All" %} selected {% endif %}>Currency</option>
+            </select>
+        </div>
+        {% if selected_category == "All" %}
+            <div id="categoryFrequency" style="display: none;"> {{ categoryFrequency | tojson}} </div>
+        {% endif %}
+            <!-- First Chart: -->
+        <div class="row mt-3">
+            <!-- First Chart: Amount -->
+            <div class="col-md-6">
+                <div class="border p-4 chart-container" style="display: grid; place-items: center; height: 400px; width: 600px;"">
+                    <canvas id="amountsChart"></canvas>
+                </div>
+            </div>
+            <!-- Second Chart: Count -->
+            <div class="col-md-6">
+                <!-- <div class="border p-4 chart-container" style="height: 400px; max-width: 600px; margin: auto;"> -->
+                <div class="border p-4 chart-container" style="display: grid; place-items: center; height: 400px; width: 600px;">
+                    <canvas id="countsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Include external JavaScript file -->
+        <script src="{{ url_for('static', filename='js/dashboard_graphs.js') }}"></script>
+
+    </div>
+
+
+    <!-- Investment List -->
+    <div class="mb-4">
+        <h4>Your Investments</h4>
+        {% if investments %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Asset Name</th>
+                        <th>Category</th>
+                        <th>Currency</th>
+                        <th>Value</th>
+                        <th>Recently</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Loop through investments -->
+                    {% for investment in investments %}
+                    <tr>
+                        <td>{{ investment.name }}</td>
+                        <td>{{ investment.category }}</td>
+                        <td>{{ investment.currency }}</td>
+                        <td>{{ "%.2f"|format(investment.amount) }}</td>
+                        <td>{{ investment.event_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <!-- Message for no investments -->
+            <p class="text-muted">No Investments yet</p>
+        {% endif %}
+    </div>        
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+{% endblock %}

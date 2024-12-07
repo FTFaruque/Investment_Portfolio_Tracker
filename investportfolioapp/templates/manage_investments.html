@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1>Manage Investments</h1>
+
+    <!-- Add Investment Section -->
+    <div>
+        <a href="/add-investment" class="btn btn-primary">Add Investment</a>
+    </div>
+
+    <!-- Tracked Investments Section -->
+    <div>
+        <h4>Tracked Investments</h4>
+        {% if investments %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Asset Name</th>
+                        <th>Category</th>
+                        <th>Value</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for investment in investments %}
+                    <tr>
+                        <td>{{ investment.name }}</td>
+                        <td>{{ investment.category }}</td>
+                        <td>${{ "%.2f"|format(investment.amount) }}</td>
+                        <td>
+                            <form method="POST" action="/manage-investments" style="display:inline;">
+                                <input type="hidden" name="investment_to_delete" value="{{ investment._id }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted">No tracked investments yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
